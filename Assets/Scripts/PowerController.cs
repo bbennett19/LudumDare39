@@ -11,6 +11,7 @@ public class PowerController : MonoBehaviour
     public ScoreKeeper scoreKeeper;
     public AnimationCurve difficultyCurve;
     public int targetHighDifficulty = 1;
+    public EnergySlider energySlider;
 
     private float _timeToFinish;
     private float _elapsedTime = 0f;
@@ -60,5 +61,6 @@ public class PowerController : MonoBehaviour
         _timeToFinish = minTimeToFinish + (difficultyCurve.Evaluate((float)_count/(float)targetHighDifficulty) * (maxTimeToFinish-minTimeToFinish));
         wireManager.PlayAnimation();
         scoreKeeper.IncreaseScore();
+        energySlider.Recharge();
     }
 }

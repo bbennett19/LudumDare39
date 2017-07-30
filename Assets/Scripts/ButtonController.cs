@@ -10,6 +10,7 @@ public class ButtonController : MonoBehaviour {
     public float positivePercentageChange;
     public ScoreKeeper scoreKeeper;
     public AudioSource negativeClickSound;
+    public AudioSource music;
 
     private float _elapsedTime = 0f;
     private int _maxActiveButtons = 9;
@@ -71,6 +72,12 @@ public class ButtonController : MonoBehaviour {
     public void ButtonReady()
     {
         _readyCount++;
+
+        if(_readyCount == buttons.Length)
+        {
+            // Start the music
+            music.Play();
+        }
     }
 
     public void ButtonClicked(PowerButton b)
