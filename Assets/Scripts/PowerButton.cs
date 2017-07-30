@@ -10,14 +10,47 @@ public class PowerButton : MonoBehaviour
     public GameObject NegPower;
     public GameObject NoPower;
     public ButtonController buttonController;
+    public float startDelay;
+    public float scaleRate;
+    public float scaleTime;
 
     private State _currentState;
+    private bool _startUp = true;
+    private bool _expand = false;
+    private bool _shrink = false;
 
 	// Use this for initialization
 	void Start ()
     {
         SetState(State.OFF);
+        StartCoroutine(Intro());
 	}
+
+    private void Update()
+    {
+        if(_startUp)
+        {
+            if (_expand)
+                this.transform.localScale = this.transform.localScale + (Vector3.one * scaleRate * Time.deltaTime);
+            if(_shrink)
+                this.transform.localScale = this.transform.localScale - (Vector3.one * scaleRate * Time.deltaTime);
+        }
+    }
+
+    IEnumerator Intro()
+    {
+        yield return new WaitForSeconds(startDelay);
+        _expand = true;
+        yield return new WaitForSeconds(scaleTime);
+        _expand = false;
+        _shrink = true;
+        yield return new WaitForSeconds(scaleTime);
+        _shrink = false;
+        _startUp = false;
+        this.transform.localScale = Vector3.one;
+        buttonController.ButtonReady();
+        yield return null;
+    }
 
     private void SetState(State s)
     {

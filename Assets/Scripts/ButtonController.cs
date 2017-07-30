@@ -8,12 +8,16 @@ public class ButtonController : MonoBehaviour {
     public PowerController powerController;
     public float minPositivePercentage;
     public float positivePercentageChange;
+    public ScoreKeeper scoreKeeper;
+    public AudioSource negativeClickSound;
 
     private float _elapsedTime = 0f;
     private int _maxActiveButtons = 9;
     private float _positivePercentage = .80f;
     private List<PowerButton> _activeButtons = new List<PowerButton>();
     private List<PowerButton> _inactiveButtons = new List<PowerButton>();
+    private int _readyCount = 0;
+    private bool _active = true;
 
 	// Use this for initialization
 	void Start ()
@@ -24,7 +28,7 @@ public class ButtonController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-	    if(_activeButtons.Count == 0)
+	    if(_readyCount == buttons.Length && _activeButtons.Count == 0 && _active)
         {
             _elapsedTime += Time.deltaTime;
 
@@ -64,13 +68,21 @@ public class ButtonController : MonoBehaviour {
         _activeButtons.Add(b);
     }
 
+    public void ButtonReady()
+    {
+        _readyCount++;
+    }
+
     public void ButtonClicked(PowerButton b)
     {
         if(b.GetState() == PowerButton.State.NEGATIVE)
         {
             // Handle negative
-            DeactivateAllButtons();
-            // Lose
+            DeactivateAllButtons(b);
+            _active = false;
+            powerController.Deactivate();
+            negativeClickSound.Play();
+            scoreKeeper.GameOver(negativeClickSound.clip.length);
         }
         else if(b.GetState() == PowerButton.State.POSITIVE)
         {
@@ -101,12 +113,15 @@ public class ButtonController : MonoBehaviour {
             _activeButtons.Remove(b);
     }
 
-    private void DeactivateAllButtons()
+    private void DeactivateAllButtons(PowerButton b = null)
     {
         for(int i = 0; i < _activeButtons.Count; i++)
         {
-            _inactiveButtons.Add(_activeButtons[i]);
-            _activeButtons[i].Deactivate();
+            if (_activeButtons[i] != b)
+            {
+                _inactiveButtons.Add(_activeButtons[i]);
+                _activeButtons[i].Deactivate();
+            }
         }
         _activeButtons.Clear();
     }

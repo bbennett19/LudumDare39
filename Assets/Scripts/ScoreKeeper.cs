@@ -1,24 +1,51 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ScoreKeeper : MonoBehaviour {
     public Text scoreText;
+    public AudioSource music;
+    public GameOverTransition gameOverTransition;
     private int _score = 0;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public static int highScore = 0;
+    private bool _newHighScore = false;
+
+    public void SetScoreText()
+    {
+        scoreText.text = _score.ToString();
+    }
 
     public void IncreaseScore()
     {
         _score++;
-        scoreText.text = _score.ToString();
+        SetScoreText();
+    }
+
+    public void GameOver(float waitTime = 0f)
+    {
+        if (_score > highScore)
+        {
+            highScore = _score;
+            _newHighScore = true;
+        }
+        else
+        {
+            _newHighScore = false;
+        }
+        StartCoroutine(Transition(waitTime));
+    }
+
+    IEnumerator Transition(float time)
+    {
+        music.Stop();
+        yield return new WaitForSeconds(time);
+        gameOverTransition.GameOver();
+    }
+
+    public bool NewHighScore()
+    {
+        return _newHighScore;
     }
 }
